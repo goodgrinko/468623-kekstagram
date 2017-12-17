@@ -48,8 +48,8 @@ for (i = 0; i < 25; i++) {
 }
 
 // Создаем DOM элементы;
-var pictureTemplate = document.querySelector('#picture-template');
-var picturesList = document.querySelector('.pictures').content;
+var pictureTemplate = document.querySelector('#picture-template').content;
+var picturesList = document.querySelector('.pictures');
 
 // ПРОБЛЕМА!!!
 var renderPhoto = function (photo) {
