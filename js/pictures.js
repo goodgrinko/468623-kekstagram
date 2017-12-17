@@ -98,9 +98,48 @@ for (i = 0; i < usersPosts.length; i++) {
 
 picturesList.appendChild(fragment);
 
-// Показываем дополнительное всплывающее окно
+// Показ/скрытие картинки в галерее
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 var galleryOverlay = document.querySelector('.gallery-overlay');
-galleryOverlay.querySelector('img.gallery-overlay-image').src = usersPosts[0].url;
-galleryOverlay.querySelector('.likes-count').textContent = usersPosts[0].likes;
-galleryOverlay.querySelector('.comments-count').textContent = usersPosts[0].comments.length;
-galleryOverlay.classList.remove('hidden');
+var galleryOverlayClose = document.querySelector('.gallery-overlay-close');
+var pictures = document.querySelectorAll('.picture');
+
+var closeEscHandler = function (event) {
+  if (event.keyCode === ESC_KEYCODE) {
+    closeOverlay();
+  }
+};
+
+var closeEnterHandler = function (event) {
+  if (event.keyCode === ENTER_KEYCODE) {
+    closeOverlay();
+  }
+};
+
+var showOverlay = function (event) {
+  event.preventDefault();
+  var clickedElement = event.currentTarget;
+  galleryOverlay.querySelector('img.gallery-overlay-image').src = clickedElement.querySelector('img').src;
+  galleryOverlay.querySelector('.likes-count').textContent = clickedElement.querySelector('.picture-likes').textContent;
+  galleryOverlay.querySelector('.comments-count').textContent = clickedElement.querySelector('.picture-comments').textContent;
+  galleryOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', closeEscHandler);
+  galleryOverlayClose.focus();
+};
+
+var closeOverlay = function () {
+  galleryOverlay.classList.add('hidden');
+  document.removeEventListener('keydown', closeEscHandler);
+};
+
+var photoClickHandler = function (event) {
+  showOverlay(event);
+};
+
+for (i = 0; i < pictures.length; i++) {
+  pictures[i].addEventListener('click', photoClickHandler);
+}
+
+galleryOverlayClose.addEventListener('click', closeOverlay);
+galleryOverlayClose.addEventListener('keydown', closeEnterHandler);
