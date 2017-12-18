@@ -233,7 +233,6 @@ for (i = 0; i <= effectsImage.length - 1; i++) {
 
 // Хеш-теги
 var hashTags = formUpload.querySelector('.upload-form-hashtags');
-var hashTagsArr = hashTags.value.split(' ');
 
 /**
  * Проверяет правильность заполненого поля с хэш-тегами
@@ -266,13 +265,13 @@ function validateHashTags(arr) {
   return true;
 }
 // TODO: После изменения неправильных хэш-тегов, необходимо повторить проверку на валидность
-formUpload.addEventListener('submit', function (event) {
+formUpload.addEventListener('click', function (event) {
   event.preventDefault();
 
   if (hashTags.value === '') {
     formUpload.submit();
   } else {
-    var messageValidation = validateHashTags(hashTagsArr);
+    var messageValidation = validateHashTags(hashTags.value.split(' '));
     if (messageValidation !== true) {
       hashTags.classList.add('upload-message-error');
       hashTags.setCustomValidity(messageValidation);
