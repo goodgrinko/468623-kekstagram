@@ -1,37 +1,47 @@
 'use strict';
 
+/**
+ * Модуль загрузки фото
+ */
 (function () {
   // Показ/скрытие формы кадрирования
-// TODO: При закрытии окна через ESC, форма не реагирует в дальнейшем на загрузку
+  // TODO: При закрытии окна через ESC, форма не реагирует в дальнейшем на загрузку
 
   var formUpload = document.querySelector('.upload-form');
   var selectedFile = formUpload.querySelector('#upload-file');
   var uploadOverlay = formUpload.querySelector('.upload-overlay');
   var uploadOverlayClose = formUpload.querySelector('.upload-form-cancel');
 
-  var closeEscHandler = function (evt) {
-    if (evt.keyCode === window.data.ESC_KEYCODE && !formUpload.querySelector('textarea:focus')) {
-      closeOverlay();
+  /**
+   * Закрывает окно при нажатии Esc или Enter
+   * Если фокус находится на форме ввода комментария, то форма закрываться не должна
+   * @param {*} evt
+   */
+  var closeKeyHandler = function (evt) {
+    if (!formUpload.querySelector('textarea:focus')) {
+      window.evt.isKeyEvent(evt, closeOverlay);
     }
   };
 
-  var closeEnterHandler = function (evt) {
-    window.evt.isEnterEvent(evt, closeEnterHandler);
-  };
-
+  /**
+   * Показывает форму для отправки фото
+   */
   var showUploadOverlay = function () {
     uploadOverlay.classList.remove('hidden');
-    document.addEventListener('keydown', closeEscHandler);
+    document.addEventListener('keydown', closeKeyHandler);
   };
 
+  /**
+   * Закрывает форму для отправки фото !БЕЗ отправки
+   */
   var closeOverlay = function () {
     uploadOverlay.classList.add('hidden');
-    document.removeEventListener('keydown', closeEscHandler);
+    document.removeEventListener('keydown', closeKeyHandler);
   };
 
   selectedFile.addEventListener('change', showUploadOverlay);
   uploadOverlayClose.addEventListener('click', closeOverlay);
-  uploadOverlayClose.addEventListener('keydown', closeEnterHandler);
+  uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
 
   // Ограничение формы ввода масштаба && изменение масштаба изображения
 
@@ -91,27 +101,27 @@
   var submitBtn = formUpload.querySelector('.upload-form-submit');
   /**
    * Проверяет правильность заполненого поля с хэш-тегами
-   * @param {Object} arr - массив с введенными хэш-тегами
+   * @param {Object} tags - массив с введенными хэш-тегами
    * @return {String} сообщение об ошибке или true
    */
-  function validateHashTags(arr) {
+  function validateHashTags(tags) {
 
-    for (i = 0; i < arr.length; i++) {
+    for (i = 0; i < tags.length; i++) {
       // Хэш-тег начинается с символа `#` (решётка)
-      if (arr[i][0] !== '#') {
+      if (tags[i][0] !== '#') {
         return 'Хеш-тег должен начинаться с # и состоять из одного слова';
       }
       // макс длина 20 символов
-      if (arr[i].length > 20) {
+      if (tags[i].length > 20) {
         return 'Длина одного хэш-тега не может быть больше 20 символов';
       }
       // макс кол-во 5
-      if (arr.length > 5) {
+      if (tags.length > 5) {
         return 'Нельзя указать больше 5 хэш-тегов';
       }
       // уникальность
-      for (var j = i + 1; j < arr.length; j++) {
-        if (arr[i].toLowerCase() === arr[j].toLowerCase()) {
+      for (var j = i + 1; j < tags.length; j++) {
+        if (tags[i].toLowerCase() === tags[j].toLowerCase()) {
           return 'Хэш-теги не должны повторяться. ' +
             'Теги не чувствительны к регистру: #ХэшТег и #хэштег считаются одним и тем же тегом';
         }
