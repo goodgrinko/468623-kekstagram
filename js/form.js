@@ -28,6 +28,7 @@
    */
   var showUploadOverlay = function () {
     uploadOverlay.classList.remove('hidden');
+    displayEffectControls();
     document.addEventListener('keydown', closeKeyHandler);
   };
 
@@ -143,6 +144,131 @@
       } else {
         formUpload.submit();
       }
+    }
+  });
+  // Ползунок интенсивности фильтра
+  var rangePin = formUpload.querySelector('.upload-effect-level-pin');
+  var effectControls = formUpload.querySelector('.upload-effect-level');
+  var defaultRangePinLeft = rangePin.style.left;
+  var rangeValue = formUpload.querySelector('.upload-effect-level-value');
+  var defaultRangeValue = rangeValue.value;
+  var rangeLine = formUpload.querySelector('.upload-effect-level-line');
+  var rangeBar = formUpload.querySelector('.upload-effect-level-val');
+  var defaultRangeBarWidth = rangeBar.style.width;
+  var currentFilter = '';
+
+  var startX;
+  var cursorLeftLimit;
+  var cursorRightLimit;
+
+  /**
+   * Меняет насыщенность текущего выбранного фильтра
+   * @param {Number} value - число, которое соответствует положению пина
+   */
+  var changeEffectValue = function (value) {
+    var newFilter;
+    switch (currentFilter) {
+      case 'effect-chrome':
+        newFilter = 'grayscale(' + value / 100 + ')'; // 0..1
+        break;
+      case 'effect-sepia':
+        newFilter = 'sepia(' + value / 100 + ')'; // 0..1
+        break;
+      case 'effect-marvin':
+        newFilter = 'invert(' + value + '%)'; // 0..100%
+        break;
+      case 'effect-phobos':
+        newFilter = 'blur(' + value / 33.33 + 'px)'; // 0..3px
+        break;
+      case 'effect-heat':
+        newFilter = 'brightness(' + value / 33.33 + ')'; // 0..3
+        break;
+      default:
+        newFilter = '';
+    }
+    imagePreview.style.filter = newFilter;
+  };
+  /**
+   * Применяет фильтр с выбранной насыщенностью
+   * @param {*} evt -
+   */
+  var applyEffect = function (evt) {
+    rangeValue.value = defaultRangeValue;
+    rangePin.style.left = defaultRangePinLeft;
+    rangeBar.style.width = defaultRangeBarWidth;
+
+    if (currentFilter.length > 0) {
+      imagePreview.classList.remove(currentFilter);
+    }
+    currentFilter = evt.target.parentNode.htmlFor.replace('upload-', '');
+    changeEffectValue(defaultRangeValue);
+  };
+  /**
+   * Отображает применение эффекта на большом фото
+   */
+  var displayEffectControls = function () {
+    if (currentFilter.length === 0 || currentFilter === 'effect-none') {
+      effectControls.classList.add('hidden');
+    } else {
+      effectControls.classList.remove('hidden');
+    }
+  };
+  /**
+   * Задаем начальную позицию курсора и добавляем события на действия мышки
+   */
+  rangePin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+    startX = evt.clientX;
+    cursorLeftLimit = -1;
+    cursorRightLimit = -1;
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  });
+  /**
+   * Фиксируем перемещение мыши
+   * @param {*} moveEvt действия мышки
+   */
+  var mouseMoveHandler = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    if (((cursorLeftLimit !== -1) && moveEvt.clientX < cursorLeftLimit)
+      || ((cursorRightLimit !== -1) && moveEvt.clientX > cursorRightLimit)) {
+      return;
+    }
+    var shiftX = startX - moveEvt.clientX;
+    startX = moveEvt.clientX;
+
+    var newValue = rangePin.offsetLeft - shiftX;
+    if (newValue < 0) {
+      newValue = 0;
+      cursorLeftLimit = moveEvt.clientX;
+    }
+    if (newValue > rangeLine.clientWidth) {
+      newValue = rangeLine.clientWidth;
+      cursorRightLimit = moveEvt.clientX;
+    }
+
+    var newValueProcent = Math.round(newValue / (rangeLine.clientWidth / 100));
+    rangeValue.value = newValueProcent;
+    rangePin.style.left = newValue + 'px';
+    rangeBar.style.width = newValueProcent + '%';
+    changeEffectValue(newValueProcent);
+  };
+  /**
+   * Фиксируем остановку перемещение мыши
+   * @param {*} upEvt отпускание клавиши мыши
+   */
+  var mouseUpHandler = function (upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+  };
+
+  document.querySelector('#upload-select-image').addEventListener('click', function (evt) {
+    if (evt.target.classList.contains('upload-effect-preview')) {
+      applyEffect(evt);
+      displayEffectControls();
     }
   });
 })();
