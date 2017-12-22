@@ -45,39 +45,22 @@
   uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
 
   // Ограничение формы ввода масштаба && изменение масштаба изображения
-
   var minusBtn = formUpload.querySelector('.upload-resize-controls-button-dec');
   var plusBtn = formUpload.querySelector('.upload-resize-controls-button-inc');
   var resizeElement = formUpload.querySelector('.upload-resize-controls-value');
-  var resizeValue = parseInt((formUpload.querySelector('.upload-resize-controls-value').value), 10);
   var imagePreview = formUpload.querySelector('.effect-image-preview');
 
   /**
-   * Увеличивает масштаб фото с шагом 25%, максимальный маштаб 100%
+   * Изменение масштаба фото-превью
+   * @param {Number} value - значение, которое выбрал пользователь
    */
-  function zoomInHandler() {
-    if (resizeValue < 100) {
-      resizeValue = resizeValue + 25;
-      var transformScale = 'scale(' + resizeValue / 100 + ')';
-      imagePreview.style['transform'] = transformScale;
-      resizeElement.value = String(resizeValue + '%');
-    }
+  function resizeImage(value) {
+    imagePreview.style['transform'] = 'scale(' + value / 100 + ')';
+    resizeElement.value = String(value + '%');
   }
-
-  /**
-   * Уменьшает масштаб фото с шагом 25%, минимальный масштаб 25%
-   */
-  function zoomOutHandler() {
-    if (resizeValue > 25) {
-      resizeValue = resizeValue - 25;
-      var transformScale = 'scale(' + resizeValue / 100 + ')';
-      imagePreview.style['transform'] = transformScale;
-      resizeElement.value = String(resizeValue + '%');
-    }
-  }
-
-  minusBtn.addEventListener('click', zoomOutHandler);
-  plusBtn.addEventListener('click', zoomInHandler);
+  // Отслеживаем и применяем изменение масштаба по клику пользователя
+  window.initializeScale(minusBtn, resizeElement, false, resizeImage);
+  window.initializeScale(plusBtn, resizeElement, true, resizeImage);
 
   // Применение эффектов
 
@@ -213,6 +196,8 @@
       effectControls.classList.remove('hidden');
     }
   };
+
+  window.initializeFilters(document.querySelector('#upload-select-image'), applyEffect, displayEffectControls);
   /**
    * Задаем начальную позицию курсора и добавляем события на действия мышки
    */
@@ -264,11 +249,4 @@
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
   };
-
-  document.querySelector('#upload-select-image').addEventListener('click', function (evt) {
-    if (evt.target.classList.contains('upload-effect-preview')) {
-      applyEffect(evt);
-      displayEffectControls();
-    }
-  });
 })();
