@@ -4,46 +4,10 @@
  * Модуль загрузки фото
  */
 (function () {
-  // Показ/скрытие формы кадрирования
-  // TODO: При закрытии окна через ESC, форма не реагирует в дальнейшем на загрузку
-
   var formUpload = document.querySelector('.upload-form');
   var selectedFile = formUpload.querySelector('#upload-file');
   var uploadOverlay = formUpload.querySelector('.upload-overlay');
   var uploadOverlayClose = formUpload.querySelector('.upload-form-cancel');
-
-  /**
-   * Закрывает окно при нажатии Esc или Enter
-   * Если фокус находится на форме ввода комментария, то форма закрываться не должна
-   * @param {*} evt
-   */
-  var closeKeyHandler = function (evt) {
-    if (!formUpload.querySelector('textarea:focus')) {
-      window.evt.isKeyEvent(evt, closeOverlay);
-    }
-  };
-
-  /**
-   * Показывает форму для отправки фото
-   */
-  var showUploadOverlay = function () {
-    uploadOverlay.classList.remove('hidden');
-    displayEffectControls();
-    document.addEventListener('keydown', closeKeyHandler);
-  };
-
-  /**
-   * Закрывает форму для отправки фото !БЕЗ отправки
-   */
-  var closeOverlay = function () {
-    uploadOverlay.classList.add('hidden');
-    formUpload.reset();
-    document.removeEventListener('keydown', closeKeyHandler);
-  };
-
-  selectedFile.addEventListener('change', showUploadOverlay);
-  uploadOverlayClose.addEventListener('click', closeOverlay);
-  uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
 
   // Ограничение формы ввода масштаба && изменение масштаба изображения
   var minusBtn = formUpload.querySelector('.upload-resize-controls-button-dec');
@@ -255,4 +219,40 @@
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
   };
+
+  // Показ/скрытие формы кадрирования
+  // TODO: При закрытии окна через ESC, форма не реагирует в дальнейшем на загрузку
+  /**
+   * Закрывает окно при нажатии Esc или Enter
+   * Если фокус находится на форме ввода комментария, то форма закрываться не должна
+   * @param {*} evt
+   */
+  var closeKeyHandler = function (evt) {
+    if (!formUpload.querySelector('textarea:focus')) {
+      window.evt.isKeyEvent(evt, closeOverlay);
+    }
+  };
+
+  /**
+   * Показывает форму для отправки фото
+   */
+  var showUploadOverlay = function () {
+    uploadOverlay.classList.remove('hidden');
+    imagePreview.style.filter = 'none';
+    effectControls.classList.add('hidden');
+    document.addEventListener('keydown', closeKeyHandler);
+  };
+
+  /**
+   * Закрывает форму для отправки фото !БЕЗ отправки
+   */
+  var closeOverlay = function () {
+    uploadOverlay.classList.add('hidden');
+    formUpload.reset();
+    document.removeEventListener('keydown', closeKeyHandler);
+  };
+
+  selectedFile.addEventListener('change', showUploadOverlay);
+  uploadOverlayClose.addEventListener('click', closeOverlay);
+  uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
 })();
