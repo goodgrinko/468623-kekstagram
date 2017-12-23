@@ -37,6 +37,7 @@
    */
   var closeOverlay = function () {
     uploadOverlay.classList.add('hidden');
+    formUpload.reset();
     document.removeEventListener('keydown', closeKeyHandler);
   };
 
@@ -113,22 +114,27 @@
     }
     return true;
   }
-  // TODO: Не отображается подсказка при ошибке
-  submitBtn.addEventListener('click', function (evt) {
-    evt.preventDefault();
+  var inputInvalid = function (element) {
+    element.style.border = '3px solid red';
+  };
 
+  var hasTagsSubmitHandler = function (evt) {
     if (hashTags.value === '') {
-      formUpload.submit();
+      window.backend.save(new FormData(formUpload), closeOverlay, window.backend.onError);
+      evt.preventDefault();
     } else {
       var messageValidation = validateHashTags(hashTags.value.split(' '));
       if (messageValidation !== true) {
-        hashTags.classList.add('upload-message-error');
+        inputInvalid(hashTags);
         hashTags.setCustomValidity(messageValidation);
       } else {
-        formUpload.submit();
+        window.backend.save(new FormData(formUpload), closeOverlay, window.backend.onError);
+        evt.preventDefault();
       }
     }
-  });
+  };
+
+  submitBtn.addEventListener('click', hasTagsSubmitHandler);
   // Ползунок интенсивности фильтра
   var rangePin = formUpload.querySelector('.upload-effect-level-pin');
   var effectControls = formUpload.querySelector('.upload-effect-level');
@@ -197,7 +203,7 @@
     }
   };
 
-  window.initializeFilters(document.querySelector('#upload-select-image'), applyEffect, displayEffectControls);
+  window.initializeFilters(document.querySelector('.upload-effect-controls'), applyEffect, displayEffectControls);
   /**
    * Задаем начальную позицию курсора и добавляем события на действия мышки
    */
