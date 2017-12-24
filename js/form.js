@@ -81,10 +81,13 @@
   var inputInvalid = function (element) {
     element.style.border = '3px solid red';
   };
-
-  var hasTagsSubmitHandler = function (evt) {
+  /**
+   * При нажатии на кнопку "сохранить", проверяем правильность заполнения поля с хэштегами
+   * и отправляем данные на сервер
+   */
+  submitBtn.addEventListener('click', function (evt) {
     if (hashTags.value === '') {
-      window.backend.save(new FormData(formUpload), closeOverlay, window.backend.onError);
+      window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
       evt.preventDefault();
     } else {
       var messageValidation = validateHashTags(hashTags.value.split(' '));
@@ -92,13 +95,11 @@
         inputInvalid(hashTags);
         hashTags.setCustomValidity(messageValidation);
       } else {
-        window.backend.save(new FormData(formUpload), closeOverlay, window.backend.onError);
+        window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
         evt.preventDefault();
       }
     }
-  };
-
-  submitBtn.addEventListener('click', hasTagsSubmitHandler);
+  });
   // Ползунок интенсивности фильтра
   var rangePin = formUpload.querySelector('.upload-effect-level-pin');
   var effectControls = formUpload.querySelector('.upload-effect-level');
@@ -221,7 +222,6 @@
   };
 
   // Показ/скрытие формы кадрирования
-  // TODO: При закрытии окна через ESC, форма не реагирует в дальнейшем на загрузку
   /**
    * Закрывает окно при нажатии Esc или Enter
    * Если фокус находится на форме ввода комментария, то форма закрываться не должна

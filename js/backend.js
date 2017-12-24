@@ -5,34 +5,34 @@
   var SUCCESS_CODE = 200;
   var TIMEOUT_SERVER = 3000;
 
-  var getXhr = function (onLoad, onError) {
+  var getXhr = function (loadHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.timeout = 10000;
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
-        onLoad(xhr.response);
+        loadHandler(xhr.response);
       } else {
-        onError(xhr.response[0].errorMessage);
+        errorHandler(xhr.response[0].errorMessage);
       }
     });
     xhr.addEventListener('error', function () {
-      onError('Ошибка соединения');
+      errorHandler('Ошибка соединения');
     });
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      errorHandler('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
     return xhr;
   };
 
   window.backend = {
-    load: function (onLoad, onError) {
-      var xhr = getXhr(onLoad, onError);
+    load: function (loadHandler, errorHandler) {
+      var xhr = getXhr(loadHandler, errorHandler);
       xhr.open('GET', SERVER_URL + '/data');
       xhr.send();
     },
-    save: function (data, onLoad, onError) {
-      var xhr = getXhr(onLoad, onError);
+    save: function (data, loadHandler, errorHandler) {
+      var xhr = getXhr(loadHandler, errorHandler);
       xhr.open('POST', SERVER_URL);
       xhr.send(data);
     },
