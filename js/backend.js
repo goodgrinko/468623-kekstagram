@@ -13,7 +13,7 @@
       if (xhr.status === SUCCESS_CODE) {
         loadHandler(xhr.response);
       } else {
-        errorHandler(xhr.response[0].errorMessage);
+        errorHandler('Неизвестный статус: ' + xhr.status + ' ' + xhr.statusText);
       }
     });
     xhr.addEventListener('error', function () {
@@ -36,7 +36,7 @@
       xhr.open('POST', SERVER_URL);
       xhr.send(data);
     },
-    onError: function (errorMessage) {
+    errorHandler: function (errorMessage) {
       var node = document.createElement('div');
       node.classList.add('error-message');
       node.textContent = errorMessage;
