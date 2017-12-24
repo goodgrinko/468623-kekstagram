@@ -8,7 +8,8 @@
   // Создаем DOM элементы;
   var pictureTemplate = document.querySelector('#picture-template').content;
   var picturesList = document.querySelector('.pictures');
-
+  var filters = document.querySelector('.filters');
+  var data = [];
   /**
    * Рендерит фото на основе шаблона разметки
    * @param {Number} photo - номер элемента массива c постами пользователей
@@ -23,10 +24,18 @@
   };
 
   // Вставляем фото в разметку
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < window.data.usersPosts.length; i++) {
-    fragment.appendChild(renderPhoto(window.data.usersPosts[i]));
-  }
+  var createGallery = function (array) {
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < array.length; i++) {
+      fragment.appendChild(renderPhoto(array[i]));
+    }
+    picturesList.appendChild(fragment);
+  };
 
-  picturesList.appendChild(fragment);
+  var successHandler = function (photos) {
+    createGallery(photos);
+    filters.classList.remove('filters-inactive');
+    data = photos;
+  };
+  window.backend.load(successHandler, window.backend.errorHandler);
 })();

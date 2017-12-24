@@ -4,80 +4,28 @@
  * Модуль загрузки фото
  */
 (function () {
-  // Показ/скрытие формы кадрирования
-  // TODO: При закрытии окна через ESC, форма не реагирует в дальнейшем на загрузку
-
   var formUpload = document.querySelector('.upload-form');
   var selectedFile = formUpload.querySelector('#upload-file');
   var uploadOverlay = formUpload.querySelector('.upload-overlay');
   var uploadOverlayClose = formUpload.querySelector('.upload-form-cancel');
 
-  /**
-   * Закрывает окно при нажатии Esc или Enter
-   * Если фокус находится на форме ввода комментария, то форма закрываться не должна
-   * @param {*} evt
-   */
-  var closeKeyHandler = function (evt) {
-    if (!formUpload.querySelector('textarea:focus')) {
-      window.evt.isKeyEvent(evt, closeOverlay);
-    }
-  };
-
-  /**
-   * Показывает форму для отправки фото
-   */
-  var showUploadOverlay = function () {
-    uploadOverlay.classList.remove('hidden');
-    displayEffectControls();
-    document.addEventListener('keydown', closeKeyHandler);
-  };
-
-  /**
-   * Закрывает форму для отправки фото !БЕЗ отправки
-   */
-  var closeOverlay = function () {
-    uploadOverlay.classList.add('hidden');
-    document.removeEventListener('keydown', closeKeyHandler);
-  };
-
-  selectedFile.addEventListener('change', showUploadOverlay);
-  uploadOverlayClose.addEventListener('click', closeOverlay);
-  uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
-
   // Ограничение формы ввода масштаба && изменение масштаба изображения
-
   var minusBtn = formUpload.querySelector('.upload-resize-controls-button-dec');
   var plusBtn = formUpload.querySelector('.upload-resize-controls-button-inc');
   var resizeElement = formUpload.querySelector('.upload-resize-controls-value');
-  var resizeValue = parseInt((formUpload.querySelector('.upload-resize-controls-value').value), 10);
   var imagePreview = formUpload.querySelector('.effect-image-preview');
 
   /**
-   * Увеличивает масштаб фото с шагом 25%, максимальный маштаб 100%
+   * Изменение масштаба фото-превью
+   * @param {Number} value - значение, которое выбрал пользователь
    */
-  function zoomInHandler() {
-    if (resizeValue < 100) {
-      resizeValue = resizeValue + 25;
-      var transformScale = 'scale(' + resizeValue / 100 + ')';
-      imagePreview.style['transform'] = transformScale;
-      resizeElement.value = String(resizeValue + '%');
-    }
+  function resizeImage(value) {
+    imagePreview.style['transform'] = 'scale(' + value / 100 + ')';
+    resizeElement.value = String(value + '%');
   }
-
-  /**
-   * Уменьшает масштаб фото с шагом 25%, минимальный масштаб 25%
-   */
-  function zoomOutHandler() {
-    if (resizeValue > 25) {
-      resizeValue = resizeValue - 25;
-      var transformScale = 'scale(' + resizeValue / 100 + ')';
-      imagePreview.style['transform'] = transformScale;
-      resizeElement.value = String(resizeValue + '%');
-    }
-  }
-
-  minusBtn.addEventListener('click', zoomOutHandler);
-  plusBtn.addEventListener('click', zoomInHandler);
+  // Отслеживаем и применяем изменение масштаба по клику пользователя
+  window.initializeScale(minusBtn, resizeElement, false, resizeImage);
+  window.initializeScale(plusBtn, resizeElement, true, resizeImage);
 
   // Применение эффектов
 
@@ -130,19 +78,25 @@
     }
     return true;
   }
-  // TODO: Не отображается подсказка при ошибке
+  var inputInvalid = function (element) {
+    element.style.border = '3px solid red';
+  };
+  /**
+   * При нажатии на кнопку "сохранить", проверяем правильность заполнения поля с хэштегами
+   * и отправляем данные на сервер
+   */
   submitBtn.addEventListener('click', function (evt) {
-    evt.preventDefault();
-
     if (hashTags.value === '') {
-      formUpload.submit();
+      window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
+      evt.preventDefault();
     } else {
       var messageValidation = validateHashTags(hashTags.value.split(' '));
       if (messageValidation !== true) {
-        hashTags.classList.add('upload-message-error');
+        inputInvalid(hashTags);
         hashTags.setCustomValidity(messageValidation);
       } else {
-        formUpload.submit();
+        window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
+        evt.preventDefault();
       }
     }
   });
@@ -213,6 +167,8 @@
       effectControls.classList.remove('hidden');
     }
   };
+
+  window.initializeFilters(document.querySelector('.upload-effect-controls'), applyEffect, displayEffectControls);
   /**
    * Задаем начальную позицию курсора и добавляем события на действия мышки
    */
@@ -265,10 +221,38 @@
     document.removeEventListener('mouseup', mouseUpHandler);
   };
 
-  document.querySelector('#upload-select-image').addEventListener('click', function (evt) {
-    if (evt.target.classList.contains('upload-effect-preview')) {
-      applyEffect(evt);
-      displayEffectControls();
+  // Показ/скрытие формы кадрирования
+  /**
+   * Закрывает окно при нажатии Esc или Enter
+   * Если фокус находится на форме ввода комментария, то форма закрываться не должна
+   * @param {*} evt
+   */
+  var closeKeyHandler = function (evt) {
+    if (!formUpload.querySelector('textarea:focus')) {
+      window.evt.isKeyEvent(evt, closeOverlay);
     }
-  });
+  };
+
+  /**
+   * Показывает форму для отправки фото
+   */
+  var showUploadOverlay = function () {
+    uploadOverlay.classList.remove('hidden');
+    imagePreview.style.filter = 'none';
+    effectControls.classList.add('hidden');
+    document.addEventListener('keydown', closeKeyHandler);
+  };
+
+  /**
+   * Закрывает форму для отправки фото !БЕЗ отправки
+   */
+  var closeOverlay = function () {
+    uploadOverlay.classList.add('hidden');
+    formUpload.reset();
+    document.removeEventListener('keydown', closeKeyHandler);
+  };
+
+  selectedFile.addEventListener('change', showUploadOverlay);
+  uploadOverlayClose.addEventListener('click', closeOverlay);
+  uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
 })();
