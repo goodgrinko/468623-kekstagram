@@ -24,8 +24,12 @@
     resizeElement.value = String(value + '%');
   }
   // Отслеживаем и применяем изменение масштаба по клику пользователя
-  window.initializeScale(minusBtn, resizeElement, false, resizeImage);
-  window.initializeScale(plusBtn, resizeElement, true, resizeImage);
+  minusBtn.addEventListener('click', function () {
+    window.getScaleValue(resizeElement, false, resizeImage);
+  });
+  plusBtn.addEventListener('click', function () {
+    window.getScaleValue(resizeElement, true, resizeImage);
+  });
 
   // Применение эффектов
 
@@ -95,6 +99,7 @@
         inputInvalid(hashTags);
         hashTags.setCustomValidity(messageValidation);
       } else {
+        hashTags.style.border = 'none';
         window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
         evt.preventDefault();
       }
@@ -238,6 +243,8 @@
    */
   var showUploadOverlay = function () {
     uploadOverlay.classList.remove('hidden');
+    imagePreview.style['transform'] = 'scale(1)';
+    resizeElement.value = String(100 + '%');
     imagePreview.style.filter = 'none';
     effectControls.classList.add('hidden');
     document.addEventListener('keydown', closeKeyHandler);

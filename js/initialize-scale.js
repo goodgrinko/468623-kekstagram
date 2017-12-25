@@ -7,12 +7,12 @@
    * @param {boolean} plus - user хочет уменьшить значение (false) || увеличить (true)
    * @return {number} вычисленное значение
    */
-  var getScaleValue = function (scaleElement, plus) {
+  window.getScaleValue = function (scaleElement, plus, applyScale) {
     plus = plus || false;
-    var min = Number(scaleElement.getAttribute('min').replace('%', ''));
-    var max = Number(scaleElement.getAttribute('max').replace('%', ''));
-    var step = Number(scaleElement.getAttribute('step').replace('%', ''));
-    var scaleValue = Number(scaleElement.getAttribute('value').replace('%', ''));
+    var min = Number(scaleElement.min.replace('%', ''));
+    var max = Number(scaleElement.max.replace('%', ''));
+    var step = Number(scaleElement.step.replace('%', ''));
+    var scaleValue = Number(scaleElement.value.replace('%', ''));
 
     if (plus) {
       scaleValue += step;
@@ -25,8 +25,9 @@
         scaleValue = min;
       }
     }
-
-    return scaleValue;
+    if (typeof applyScale === 'function') {
+      applyScale(scaleValue);
+    }
   };
 
   /**
@@ -35,8 +36,7 @@
    * @param {DOM_Element} scaleElement - input, который содержит значение масштаба
    * @param {boolean} plus - увеличить (true) || уменьшить (false)
    * @param {function} applyScale - отображаем изменение элемента в UI
-   */
-  window.initializeScale = function (clickedElement, scaleElement, plus, applyScale) {
+  window.initializeScale = function (scaleElement, plus, applyScale) {
     clickedElement.addEventListener('click', applyScale(getScaleValue(scaleElement, plus)));
-  };
+  };*/
 })();
