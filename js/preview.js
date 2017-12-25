@@ -5,15 +5,17 @@
  */
 (function () {
   window.evt = {
+    ESC_KEYCODE: 27,
+    ENTER_KEYCODE: 13,
     /**
      * Выполняет заданное действие при нажатии Esc или Enter
      * @param {*} evt - отслеживаемое событие по клавишам Esc или Enter
      * @param {Object} action - действие, которое необходимо выполнить
      */
     isKeyEvent: function (evt, action) {
-      if (evt.keyCode === window.data.ESC_KEYCODE) {
+      if (evt.keyCode === window.evt.ESC_KEYCODE) {
         action();
-      } else if (evt.keyCode === window.data.ENTER_KEYCODE) {
+      } else if (evt.keyCode === window.evt.ENTER_KEYCODE) {
         action();
       }
     }
