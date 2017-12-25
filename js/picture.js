@@ -9,6 +9,7 @@
   var pictureTemplate = document.querySelector('#picture-template').content;
   var picturesList = document.querySelector('.pictures');
   var filters = document.querySelector('.filters');
+  var data = [];
   /**
    * Рендерит фото на основе шаблона разметки
    * @param {Number} photo - номер элемента массива c постами пользователей
