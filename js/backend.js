@@ -1,42 +1,48 @@
 'use strict';
 
 (function () {
-  var SERVER_URL = 'https://1510.dump.academy/kekstagram';
+  var SERVER_URL_POST = 'https://1510.dump.academy/kekstagram';
+  var SERVER_URL_GET = 'https://1510.dump.academy/kekstagram/data';
   var SUCCESS_CODE = 200;
   var TIMEOUT_SERVER = 3000;
-
-  var getXhr = function (loadHandler, errorHandler) {
+  /**
+   * Создаем новый запрос к серверу
+   * @param {function} successLoad - функция, которая обрабатывает запрос при успешном ответе сервера
+   * @param {function} errorLoad - функция, которая показывает пользователю какая ошибка сервера произошла
+   * @return {XMLHttpRequest}
+   */
+  var getXhr = function (successLoad, errorLoad) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.timeout = 10000;
+    xhr.timeout = TIMEOUT_SERVER;
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
-        loadHandler(xhr.response);
+        successLoad(xhr.response);
       } else {
-        errorHandler('Неизвестный статус: ' + xhr.status + ' ' + xhr.statusText);
+        errorLoad('Неизвестный статус: ' + xhr.status + ' ' + xhr.statusText);
       }
     });
     xhr.addEventListener('error', function () {
-      errorHandler('Ошибка соединения');
+      errorLoad('Ошибка соединения');
     });
     xhr.addEventListener('timeout', function () {
-      errorHandler('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      errorLoad('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
     return xhr;
   };
 
   window.backend = {
-    load: function (loadHandler, errorHandler) {
-      var xhr = getXhr(loadHandler, errorHandler);
-      xhr.open('GET', SERVER_URL + '/data');
+    load: function (loadHandler, errorLoad) {
+      var xhr = getXhr(loadHandler, errorLoad);
+      xhr.open('GET', SERVER_URL_GET);
       xhr.send();
     },
-    save: function (data, loadHandler, errorHandler) {
-      var xhr = getXhr(loadHandler, errorHandler);
-      xhr.open('POST', SERVER_URL);
+    save: function (data, loadHandler, errorLoad) {
+      var xhr = getXhr(loadHandler, errorLoad);
+      xhr.open('POST', SERVER_URL_POST);
       xhr.send(data);
     },
-    errorHandler: function (errorMessage) {
+    errorLoad: function (errorMessage) {
       var node = document.createElement('div');
       node.classList.add('error-message');
       node.textContent = errorMessage;
