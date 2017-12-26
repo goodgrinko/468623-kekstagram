@@ -73,13 +73,13 @@
     switch (filter) {
       // Популярные фотографии
       case 'popular':
-        sortedPhotos.sort(function (first, second) {
+        sortedPhotos = originalPhotos.slice(0).sort(function (first, second) {
           return second.likes - first.likes;
         });
         break;
       // Обсуждаемые фотографии
       case 'discussed':
-        sortedPhotos.sort(function (first, second) {
+        sortedPhotos = originalPhotos.slice(0).sort(function (first, second) {
           return second.comments.length - first.comments.length;
         });
         break;
