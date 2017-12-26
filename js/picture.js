@@ -11,7 +11,7 @@
   var filters = document.querySelector('.filters');
   var sortedPhotos = [];
   var originalPhotos = [];
-
+  var currentFilter = 'recommend';
   /**
    * Рендерит фото на основе шаблона разметки
    * @param {Number} photo - номер элемента массива c постами пользователей
@@ -25,7 +25,9 @@
     return photoElement;
   };
 
-  // Вставляем фото в разметку
+  /**
+   * Отрисовываем галлерею с отсортированным массивом фото
+   */
   var createGallery = function () {
     clearGallery();
     var fragment = document.createDocumentFragment();
@@ -34,21 +36,32 @@
     }
     picturesList.appendChild(fragment);
   };
-
+  /**
+   * Чистим галерею для новой сортировки
+   */
   var clearGallery = function () {
     while (picturesList.firstChild) {
       picturesList.removeChild(picturesList.firstChild);
     }
   };
-  var successHandler = function (photos) {
+  /**
+   * Отрисовываем галерею в случае успешной загрузки данных с сервера
+   * @param {XMLHttpRequest} photos
+   */
+  var successLoad = function (photos) {
     originalPhotos = photos;
     sortedPhotos = photos.slice(0);
     createGallery();
     filters.classList.remove('filters-inactive');
   };
-  window.backend.load(successHandler, window.backend.errorHandler);
-  var currentFilter = 'recommend';
-
+  /**
+   * Загружаем данные с сервера и отрисовываем галерею
+   */
+  window.backend.load(successLoad, window.backend.errorHandler);
+  /**
+   * Сортируем фото
+   * @param {event} evt
+   */
   var filterPhotos = function (evt) {
     if (evt.target.type !== 'radio') {
       return;
@@ -60,13 +73,13 @@
     switch (filter) {
       // Популярные фотографии
       case 'popular':
-        sortedPhotos = originalPhotos.slice(0).sort(function (first, second) {
+        sortedPhotos.sort(function (first, second) {
           return second.likes - first.likes;
         });
         break;
       // Обсуждаемые фотографии
       case 'discussed':
-        sortedPhotos = originalPhotos.slice(0).sort(function (first, second) {
+        sortedPhotos.sort(function (first, second) {
           return second.comments.length - first.comments.length;
         });
         break;

@@ -3,9 +3,9 @@
 (function () {
   /**
    * Рассчитываем значение выбранного элемента
-   * @param {DOM_Element} scaleElement - input, который отвечает за значение изменяемого элемента
+   * @param {DOM_element} scaleElement - input, который отвечает за значение изменяемого элемента
    * @param {boolean} plus - user хочет уменьшить значение (false) || увеличить (true)
-   * @return {number} вычисленное значение
+   * @param {function} applyScale - применяем рассчитанный масштаб
    */
   window.getScaleValue = function (scaleElement, plus, applyScale) {
     plus = plus || false;
@@ -29,14 +29,4 @@
       applyScale(scaleValue);
     }
   };
-
-  /**
-   * Отслеживает клик по элементу для изменения масштаба
-   * @param {DOM_Element} clickedElement - UI элемент, который изменяет user
-   * @param {DOM_Element} scaleElement - input, который содержит значение масштаба
-   * @param {boolean} plus - увеличить (true) || уменьшить (false)
-   * @param {function} applyScale - отображаем изменение элемента в UI
-  window.initializeScale = function (scaleElement, plus, applyScale) {
-    clickedElement.addEventListener('click', applyScale(getScaleValue(scaleElement, plus)));
-  };*/
 })();

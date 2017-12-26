@@ -5,7 +5,12 @@
   var SERVER_URL_GET = 'https://1510.dump.academy/kekstagram/data';
   var SUCCESS_CODE = 200;
   var TIMEOUT_SERVER = 3000;
-
+  /**
+   * Создаем новый запрос к серверу
+   * @param {function} successLoad - функция, которая обрабатывает запрос при успешном ответе сервера
+   * @param {function} errorLoad - функция, которая показывает пользователю какая ошибка сервера произошла
+   * @return {XMLHttpRequest}
+   */
   var getXhr = function (successLoad, errorLoad) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';

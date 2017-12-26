@@ -8,13 +8,29 @@
   var selectedFile = formUpload.querySelector('#upload-file');
   var uploadOverlay = formUpload.querySelector('.upload-overlay');
   var uploadOverlayClose = formUpload.querySelector('.upload-form-cancel');
-
-  // Ограничение формы ввода масштаба && изменение масштаба изображения
+  // Изменение масштаба
   var minusBtn = formUpload.querySelector('.upload-resize-controls-button-dec');
   var plusBtn = formUpload.querySelector('.upload-resize-controls-button-inc');
   var resizeElement = formUpload.querySelector('.upload-resize-controls-value');
+  // Применение фильтров
   var imagePreview = formUpload.querySelector('.effect-image-preview');
-
+  var effectsImage = formUpload.querySelectorAll('.upload-effect-label');
+  // Ползунок интенсивности фильтра
+  var rangePin = formUpload.querySelector('.upload-effect-level-pin');
+  var effectControls = formUpload.querySelector('.upload-effect-level');
+  var defaultRangePinLeft = rangePin.style.left;
+  var rangeValue = formUpload.querySelector('.upload-effect-level-value');
+  var defaultRangeValue = rangeValue.value;
+  var rangeLine = formUpload.querySelector('.upload-effect-level-line');
+  var rangeBar = formUpload.querySelector('.upload-effect-level-val');
+  var defaultRangeBarWidth = rangeBar.style.width;
+  var currentFilter = '';
+  var startX;
+  var cursorLeftLimit;
+  var cursorRightLimit;
+  // Хеш-теги
+  var hashTags = formUpload.querySelector('.upload-form-hashtags');
+  var submitBtn = formUpload.querySelector('.upload-form-submit');
   /**
    * Изменение масштаба фото-превью
    * @param {Number} value - значение, которое выбрал пользователь
@@ -23,18 +39,15 @@
     imagePreview.style['transform'] = 'scale(' + value / 100 + ')';
     resizeElement.value = String(value + '%');
   }
-  // Отслеживаем и применяем изменение масштаба по клику пользователя
+  /**
+   * Отслеживаем и применяем изменение масштаба по клику пользователя
+   */
   minusBtn.addEventListener('click', function () {
     window.getScaleValue(resizeElement, false, resizeImage);
   });
   plusBtn.addEventListener('click', function () {
     window.getScaleValue(resizeElement, true, resizeImage);
   });
-
-  // Применение эффектов
-
-  var effectsImage = formUpload.querySelectorAll('.upload-effect-label');
-
   /**
    * Применяет выбранный пользователем фильтр к фото
    * @param {*} evt - нажатие на фото-превью с фильтром
@@ -48,10 +61,6 @@
   for (var i = 0; i <= effectsImage.length - 1; i++) {
     effectsImage[i].addEventListener('click', addEffectImageHandler, true);
   }
-
-  // Хеш-теги
-  var hashTags = formUpload.querySelector('.upload-form-hashtags');
-  var submitBtn = formUpload.querySelector('.upload-form-submit');
   /**
    * Проверяет правильность заполненого поля с хэш-тегами
    * @param {Object} tags - массив с введенными хэш-тегами
@@ -82,44 +91,6 @@
     }
     return true;
   }
-  var inputInvalid = function (element) {
-    element.style.border = '3px solid red';
-  };
-  /**
-   * При нажатии на кнопку "сохранить", проверяем правильность заполнения поля с хэштегами
-   * и отправляем данные на сервер
-   */
-  submitBtn.addEventListener('click', function (evt) {
-    if (hashTags.value === '') {
-      window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
-      evt.preventDefault();
-    } else {
-      var messageValidation = validateHashTags(hashTags.value.split(' '));
-      if (messageValidation !== true) {
-        inputInvalid(hashTags);
-        hashTags.setCustomValidity(messageValidation);
-      } else {
-        hashTags.style.border = 'none';
-        window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
-        evt.preventDefault();
-      }
-    }
-  });
-  // Ползунок интенсивности фильтра
-  var rangePin = formUpload.querySelector('.upload-effect-level-pin');
-  var effectControls = formUpload.querySelector('.upload-effect-level');
-  var defaultRangePinLeft = rangePin.style.left;
-  var rangeValue = formUpload.querySelector('.upload-effect-level-value');
-  var defaultRangeValue = rangeValue.value;
-  var rangeLine = formUpload.querySelector('.upload-effect-level-line');
-  var rangeBar = formUpload.querySelector('.upload-effect-level-val');
-  var defaultRangeBarWidth = rangeBar.style.width;
-  var currentFilter = '';
-
-  var startX;
-  var cursorLeftLimit;
-  var cursorRightLimit;
-
   /**
    * Меняет насыщенность текущего выбранного фильтра
    * @param {Number} value - число, которое соответствует положению пина
@@ -149,7 +120,7 @@
   };
   /**
    * Применяет фильтр с выбранной насыщенностью
-   * @param {*} evt -
+   * @param {event} evt
    */
   var applyEffect = function (evt) {
     rangeValue.value = defaultRangeValue;
@@ -225,7 +196,6 @@
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
   };
-
   // Показ/скрытие формы кадрирования
   /**
    * Закрывает окно при нажатии Esc или Enter
@@ -237,7 +207,6 @@
       window.evt.isKeyEvent(evt, closeOverlay);
     }
   };
-
   /**
    * Показывает форму для отправки фото
    */
@@ -249,7 +218,6 @@
     effectControls.classList.add('hidden');
     document.addEventListener('keydown', closeKeyHandler);
   };
-
   /**
    * Закрывает форму для отправки фото !БЕЗ отправки
    */
@@ -262,4 +230,32 @@
   selectedFile.addEventListener('change', showUploadOverlay);
   uploadOverlayClose.addEventListener('click', closeOverlay);
   uploadOverlayClose.addEventListener('keydown', closeKeyHandler);
+
+  /**
+   * Добавляем красную рамку вокруг невалидного эелемента
+   * @param {DOM_element} element - элемент, который проверяем на валидность
+   */
+  var inputInvalid = function (element) {
+    element.style.border = '3px solid red';
+  };
+  /**
+   * При нажатии на кнопку "сохранить", проверяем правильность заполнения поля с хэштегами
+   * и отправляем данные на сервер
+   */
+  submitBtn.addEventListener('click', function (evt) {
+    if (hashTags.value === '') {
+      window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
+      evt.preventDefault();
+    } else {
+      var messageValidation = validateHashTags(hashTags.value.split(' '));
+      if (messageValidation !== true) {
+        inputInvalid(hashTags);
+        hashTags.setCustomValidity(messageValidation);
+      } else {
+        hashTags.style.border = 'none';
+        window.backend.save(new FormData(formUpload), closeOverlay, window.backend.errorHandler);
+        evt.preventDefault();
+      }
+    }
+  });
 })();
