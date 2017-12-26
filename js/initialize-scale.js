@@ -7,7 +7,7 @@
    * @param {boolean} plus - user хочет уменьшить значение (false) || увеличить (true)
    * @param {function} applyScale - применяем рассчитанный масштаб
    */
-  window.getScaleValue = function (scaleElement, plus, applyScale) {
+  window.initializeScale = function (scaleElement, plus, applyScale) {
     plus = plus || false;
     var min = Number(scaleElement.min.replace('%', ''));
     var max = Number(scaleElement.max.replace('%', ''));

@@ -43,10 +43,10 @@
    * Отслеживаем и применяем изменение масштаба по клику пользователя
    */
   minusBtn.addEventListener('click', function () {
-    window.getScaleValue(resizeElement, false, resizeImage);
+    window.initializeScale(resizeElement, false, resizeImage);
   });
   plusBtn.addEventListener('click', function () {
-    window.getScaleValue(resizeElement, true, resizeImage);
+    window.initializeScale(resizeElement, true, resizeImage);
   });
   /**
    * Применяет выбранный пользователем фильтр к фото
