@@ -35,10 +35,10 @@
    * Изменение масштаба фото-превью
    * @param {Number} value - значение, которое выбрал пользователь
    */
-  function resizeImage(value) {
+  var resizeImage = function (value) {
     imagePreview.style['transform'] = 'scale(' + value / 100 + ')';
     resizeElement.value = String(value + '%');
-  }
+  };
   /**
    * Отслеживаем и применяем изменение масштаба по клику пользователя
    */
@@ -52,11 +52,11 @@
    * Применяет выбранный пользователем фильтр к фото
    * @param {*} evt - нажатие на фото-превью с фильтром
    */
-  function addEffectImageHandler(evt) {
+  var addEffectImageHandler = function (evt) {
     var idClickedEffect = evt.currentTarget.previousElementSibling.id;
     idClickedEffect = idClickedEffect.substring(7);
     imagePreview.className = 'effect-image-preview ' + idClickedEffect;
-  }
+  };
 
   for (var i = 0; i <= effectsImage.length - 1; i++) {
     effectsImage[i].addEventListener('click', addEffectImageHandler, true);
@@ -66,7 +66,7 @@
    * @param {Object} tags - массив с введенными хэш-тегами
    * @return {String} сообщение об ошибке или true
    */
-  function validateHashTags(tags) {
+  var validateHashTags = function (tags) {
 
     for (i = 0; i < tags.length; i++) {
       // Хэш-тег начинается с символа `#` (решётка)
@@ -94,7 +94,7 @@
       }
     }
     return true;
-  }
+  };
   /**
    * Меняет насыщенность текущего выбранного фильтра
    * @param {Number} value - число, которое соответствует положению пина
@@ -207,7 +207,7 @@
    * @param {*} evt
    */
   var closeKeyHandler = function (evt) {
-    if (!formUpload.querySelector('textarea:focus')) {
+    if (!formUpload.querySelector('*:focus')) {
       window.evt.isKeyEvent(evt, closeOverlay);
     }
   };
@@ -220,6 +220,7 @@
     resizeElement.value = String(100 + '%');
     imagePreview.style.filter = 'none';
     effectControls.classList.add('hidden');
+    minusBtn.focus();
     document.addEventListener('keydown', closeKeyHandler);
   };
   /**

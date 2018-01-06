@@ -13,9 +13,7 @@
      * @param {function} action - действие, которое необходимо выполнить
      */
     isKeyEvent: function (evt, action) {
-      if (evt.keyCode === window.evt.ESC_KEYCODE) {
-        action();
-      } else if (evt.keyCode === window.evt.ENTER_KEYCODE) {
+      if (evt.keyCode === window.evt.ESC_KEYCODE || window.evt.ENTER_KEYCODE) {
         action();
       }
     }
