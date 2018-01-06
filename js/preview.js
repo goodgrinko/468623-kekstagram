@@ -50,15 +50,13 @@
     document.removeEventListener('keydown', closeKeyHandler);
   };
   /**
-   * Цикл, который добавляет отслеживание клика на каждое фото
-   * @param {array} photos - массив c фото
+   * Добавляет отслеживание клика на каждое фото
+   * @param {String} elem - фото из массива
    */
-  var showPreviewHandler = function (photos) {
-    for (var i = 0; i < photos.length; i++) {
-      photos[i].addEventListener('click', showOverlay);
-    }
+  var showPreviewHandler = function (elem) {
+    elem.addEventListener('click', showOverlay);
   };
-  showPreviewHandler(document.querySelectorAll('.pictures'));
+  (document.querySelectorAll('.pictures')).forEach(showPreviewHandler);
   galleryOverlayClose.addEventListener('click', closeOverlay);
   galleryOverlayClose.addEventListener('keydown', closeKeyHandler);
 })();
